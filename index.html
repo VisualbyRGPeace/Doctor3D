@@ -1,0 +1,112 @@
+<!doctype html>
+<html lang="vi">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width,initial-scale=1">
+  <title>Doctor3D — Xưởng mô hình 3D</title>
+  <style>
+    :root{color-scheme:dark;--bg:#17191e;--panel:#202329;--panel2:#272a31;--line:#353943;--text:#e5e7eb;--muted:#9ca3af;--accent:#ea735e;--blue:#68a9ff}
+    *{box-sizing:border-box}body{margin:0;background:var(--bg);color:var(--text);font:13px/1.4 Inter,Segoe UI,Arial,sans-serif;overflow:hidden}
+    button{font:inherit;color:inherit;cursor:pointer;border:1px solid var(--line);border-radius:5px;background:#2a2d34;padding:7px 10px}
+    button:hover{background:#383c46;border-color:#505562}button.active{background:#49312d;border-color:var(--accent);color:#ffb1a2}
+    .top{height:46px;background:#202228;border-bottom:1px solid var(--line);display:flex;align-items:center;gap:12px;padding:0 14px}
+    .brand{font-weight:700;letter-spacing:.3px}.brand b{color:var(--accent)}.top .sep{height:20px;border-left:1px solid var(--line)}
+    .top .docname{color:#c5c8d0}.top .spacer{flex:1}.top .hint{color:var(--muted);font-size:12px}
+    .layout{height:calc(100vh - 46px);display:grid;grid-template-columns:58px 1fr 255px}
+    .tools{background:#202228;border-right:1px solid var(--line);padding:10px 7px;display:flex;flex-direction:column;gap:7px;align-items:center}
+    .tools button{width:42px;height:40px;padding:0;font-size:17px}.tools .divider{width:32px;border-top:1px solid var(--line);margin:4px 0}
+    .viewport{position:relative;min-width:0;background:#25272d;overflow:hidden}.viewport canvas{display:block;width:100%;height:100%;outline:none}
+    .right{background:#202228;border-left:1px solid var(--line);display:flex;flex-direction:column;min-height:0}
+    .tabs{height:39px;display:flex;border-bottom:1px solid var(--line)}.tabs button{flex:1;border:0;border-radius:0;background:transparent;color:var(--muted)}
+    .tabs button.active{border-bottom:2px solid var(--accent);color:var(--text);background:transparent}
+    .panel{padding:12px;overflow:auto}.panel h3{font-size:12px;text-transform:uppercase;letter-spacing:.7px;color:#c4c7cf;margin:2px 0 12px}
+    .object-list{display:flex;flex-direction:column;gap:3px}.objrow{padding:7px 8px;border-radius:4px;cursor:pointer;color:#d5d7dd}.objrow:hover{background:#2b2e36}.objrow.selected{background:#454148;color:white}
+    .objrow .icon{display:inline-block;width:22px;color:#aab2c0}.empty{color:var(--muted);padding:8px 2px}
+    .field{display:grid;grid-template-columns:68px 1fr;align-items:center;margin:7px 0;gap:6px;color:var(--muted)}
+    .field input{width:100%;padding:6px 7px;background:#17191e;border:1px solid var(--line);border-radius:4px;color:var(--text)}
+    .field input:focus{outline:1px solid var(--blue)}.section{border-top:1px solid var(--line);padding-top:12px;margin-top:13px}
+    .viewport-hud{position:absolute;pointer-events:none;inset:12px 12px auto;display:flex;justify-content:space-between;align-items:flex-start}
+    .badge{background:#17191edb;border:1px solid #41444e;border-radius:5px;padding:6px 9px;color:#c9cbd2}
+    .help{position:absolute;left:12px;bottom:31px;max-width:420px;background:#17191edb;border:1px solid #41444e;border-radius:5px;padding:8px 10px;color:#c4c7cf;font-size:11px;line-height:1.65}
+    .help b{color:#fff}.status{position:absolute;bottom:0;left:0;right:0;height:23px;background:#202228d9;border-top:1px solid #343741;display:flex;align-items:center;gap:16px;padding:0 10px;color:#aeb2bb;font-size:11px}
+    .toast{position:absolute;top:58px;left:50%;transform:translateX(-50%);padding:8px 13px;background:#31343d;border:1px solid #555a66;border-radius:6px;opacity:0;transition:opacity .16s;pointer-events:none}
+    .toast.show{opacity:1}.axis{color:var(--accent)}
+    @media(max-width:800px){.layout{grid-template-columns:50px 1fr}.right{display:none}.hint{display:none}}
+  </style>
+  <script type="importmap">
+    {"imports":{"three":"https://cdn.jsdelivr.net/npm/three@0.170.0/build/three.module.js","three/addons/":"https://cdn.jsdelivr.net/npm/three@0.170.0/examples/jsm/"}}
+  </script>
+</head>
+<body>
+  <header class="top">
+    <div class="brand"><b>◆</b> Doctor3D</div><span class="sep"></span><div class="docname">Xưởng mô hình mới</div>
+    <div class="spacer"></div><span class="hint">Bản thử nghiệm · công cụ tạo hình cơ bản</span>
+    <button id="resetView" title="Đặt lại góc nhìn">Đặt lại góc nhìn</button>
+  </header>
+  <main class="layout">
+    <nav class="tools" aria-label="Công cụ tạo hình">
+      <button data-shape="Cube" title="Thêm khối lập phương">▧</button>
+      <button data-shape="Sphere" title="Thêm hình cầu">●</button>
+      <button data-shape="Cylinder" title="Thêm hình trụ">▤</button>
+      <button data-shape="Cone" title="Thêm hình nón">△</button>
+      <button data-shape="Torus" title="Thêm hình xuyến">◎</button>
+      <div class="divider"></div>
+      <button id="duplicate" title="Nhân đôi (Shift+D)">⧉</button>
+      <button id="delete" title="Xóa (X hoặc Delete)">⌫</button>
+    </nav>
+    <section class="viewport" id="viewport" aria-label="Khung nhìn 3D">
+      <div class="viewport-hud"><div class="badge">Khung nhìn phối cảnh · <span class="axis">X</span> <span style="color:#8dcc85">Y</span> <span style="color:#80adff">Z</span></div><div class="badge" id="selectionBadge">Chưa chọn đối tượng</div></div>
+      <div class="help"><b>Điều khiển</b> &nbsp; Kéo chuột trái: xoay góc nhìn · Chuột giữa: di chuyển khung nhìn · Lăn chuột: thu/phóng · Click: chọn<br><b>G</b>: di chuyển · <b>R</b>: xoay · <b>S</b>: co giãn · <b>X/Y/Z</b>: khóa trục · Click hoặc Enter: xác nhận · Esc: hủy · Shift+D: nhân đôi · Delete: xóa</div>
+      <div class="toast" id="toast"></div><div class="status"><span id="statusText">Sẵn sàng</span><span id="objectCount">0 đối tượng</span><span>Đơn vị: mét</span></div>
+    </section>
+    <aside class="right">
+      <div class="tabs"><button class="active" data-tab="outliner">Cảnh</button><button data-tab="properties">Thuộc tính</button></div>
+      <div class="panel" id="outlinerPanel"><h3>Đối tượng trong cảnh</h3><div class="object-list" id="objectList"></div></div>
+      <div class="panel" id="propertiesPanel" hidden><h3>Thuộc tính đối tượng</h3><div id="propertiesContent" class="empty">Chọn một đối tượng để xem vị trí, góc xoay và kích thước.</div></div>
+    </aside>
+  </main>
+  <script type="module">
+    import * as THREE from 'three';
+    import { OrbitControls } from 'three/addons/controls/OrbitControls.js';
+    const host=document.getElementById('viewport'), scene=new THREE.Scene();
+    scene.background=new THREE.Color('#25272d');
+    const camera=new THREE.PerspectiveCamera(50,1,.1,1000); camera.position.set(8,7,10);
+    const renderer=new THREE.WebGLRenderer({antialias:true}); renderer.setPixelRatio(Math.min(devicePixelRatio,2)); renderer.outputColorSpace=THREE.SRGBColorSpace; renderer.toneMapping=THREE.ACESFilmicToneMapping; renderer.toneMappingExposure=1.15; host.prepend(renderer.domElement);
+    const controls=new OrbitControls(camera,renderer.domElement); controls.target.set(0,0,0); controls.enableDamping=true; controls.dampingFactor=.08; controls.mouseButtons={LEFT:THREE.MOUSE.ROTATE,MIDDLE:THREE.MOUSE.PAN,RIGHT:THREE.MOUSE.PAN};
+    scene.add(new THREE.HemisphereLight(0xdce6ff,0x48434a,2.1)); const key=new THREE.DirectionalLight(0xfff2df,3.1); key.position.set(5,9,6); scene.add(key);
+    const grid=new THREE.GridHelper(20,20,0x737987,0x444750); grid.position.y=-.002; scene.add(grid);
+    const axes=new THREE.AxesHelper(2.5); scene.add(axes);
+    const ground=new THREE.Mesh(new THREE.PlaneGeometry(200,200),new THREE.MeshBasicMaterial({visible:false})); ground.rotation.x=-Math.PI/2; ground.position.y=-.01; scene.add(ground);
+    const raycaster=new THREE.Raycaster(), pointer=new THREE.Vector2(); let objects=[],selected=null,serial=0,transform=null,toastTimer;
+    const mats=[0xe88768,0x71b5ed,0x8ccc91,0xc19ae0,0xe5bd67,0x6bd2c1,0xd48aab];
+    const names={Cube:'Khối lập phương',Sphere:'Hình cầu',Cylinder:'Hình trụ',Cone:'Hình nón',Torus:'Hình xuyến'};
+    function say(s){const t=document.getElementById('toast');t.textContent=s;t.classList.add('show');clearTimeout(toastTimer);toastTimer=setTimeout(()=>t.classList.remove('show'),1500)}
+    function geometry(type){if(type==='Sphere')return new THREE.SphereGeometry(1,32,20);if(type==='Cylinder')return new THREE.CylinderGeometry(1,1,2,32);if(type==='Cone')return new THREE.ConeGeometry(1,2,32);if(type==='Torus')return new THREE.TorusGeometry(.8,.28,16,48);return new THREE.BoxGeometry(2,2,2)}
+    function addShape(type,pos){const material=new THREE.MeshStandardMaterial({color:mats[serial%mats.length],roughness:.42,metalness:.04});const mesh=new THREE.Mesh(geometry(type),material);mesh.name=names[type]+' '+(++serial);mesh.userData.shape=type;mesh.position.copy(pos||new THREE.Vector3((objects.length%3)*.35,1,Math.floor(objects.length/3)*.35));mesh.castShadow=true;mesh.receiveShadow=true;scene.add(mesh);objects.push(mesh);select(mesh);renderList();updateCount();say(names[type]+' đã được thêm');return mesh}
+    function select(obj){if(selected){selected.material.emissive?.setHex(0x000000)}selected=obj;if(selected)selected.material.emissive?.setHex(0x252525);document.getElementById('selectionBadge').textContent=obj?obj.name:'Chưa chọn đối tượng';document.getElementById('statusText').textContent=obj?'Đã chọn: '+obj.name:'Sẵn sàng';renderList();renderProps()}
+    function renderList(){const el=document.getElementById('objectList');el.innerHTML='';if(!objects.length){el.innerHTML='<div class="empty">Cảnh đang trống. Chọn một hình ở thanh công cụ để bắt đầu.</div>';return}for(const o of objects){const row=document.createElement('div');row.className='objrow'+(o===selected?' selected':'');row.innerHTML='<span class="icon">◆</span>'+o.name;row.onclick=()=>select(o);el.appendChild(row)}}
+    function fmt(n){return Number(n.toFixed(2))}
+    function renderProps(){const root=document.getElementById('propertiesContent');if(!selected){root.className='empty';root.textContent='Chọn một đối tượng để xem vị trí, góc xoay và kích thước.';return}root.className='';const p=selected.position,r=selected.rotation,s=selected.scale;root.innerHTML='<div class="section"><h3>Vị trí</h3>'+field('X','px',p.x)+field('Y','py',p.y)+field('Z','pz',p.z)+'</div><div class="section"><h3>Góc xoay · độ</h3>'+field('X','rx',THREE.MathUtils.radToDeg(r.x))+field('Y','ry',THREE.MathUtils.radToDeg(r.y))+field('Z','rz',THREE.MathUtils.radToDeg(r.z))+'</div><div class="section"><h3>Kích thước</h3>'+field('X','sx',s.x)+field('Y','sy',s.y)+field('Z','sz',s.z)+'</div>';root.querySelectorAll('input').forEach(i=>i.onchange=()=>{if(!selected)return;const v=Number(i.value);if(!Number.isFinite(v))return;const [axis,prop]=[i.dataset.key[1],i.dataset.key[0]];if(prop==='p')selected.position[axis]=v;if(prop==='r')selected.rotation[axis]=THREE.MathUtils.degToRad(v);if(prop==='s')selected.scale[axis]=Math.max(.01,v);renderProps()})}
+    function field(label,key,value){return '<label class="field">'+label+'<input type="number" step="0.1" value="'+fmt(value)+'" data-key="'+key+'"></label>'}
+    function updateCount(){document.getElementById('objectCount').textContent=objects.length+' đối tượng'}
+    function removeSelected(){if(!selected)return;const i=objects.indexOf(selected);scene.remove(selected);selected.geometry.dispose();selected.material.dispose();objects.splice(i,1);selected=null;select(null);updateCount();say('Đã xóa đối tượng')}
+    function duplicate(){if(!selected)return;const clone=selected.clone();clone.material=selected.material.clone();clone.name=selected.userData.shape==='Cube'?'Khối lập phương':names[selected.userData.shape];clone.name+=' '+(++serial);clone.position.x+=1;scene.add(clone);objects.push(clone);select(clone);updateCount();say('Đã nhân đôi đối tượng')}
+    function setTab(tab){document.querySelectorAll('.tabs button').forEach(b=>b.classList.toggle('active',b.dataset.tab===tab));document.getElementById('outlinerPanel').hidden=tab!=='outliner';document.getElementById('propertiesPanel').hidden=tab!=='properties'}
+    document.querySelectorAll('[data-tab]').forEach(b=>b.onclick=()=>setTab(b.dataset.tab));
+    document.querySelectorAll('[data-shape]').forEach(b=>b.onclick=()=>addShape(b.dataset.shape));
+    document.getElementById('delete').onclick=removeSelected;document.getElementById('duplicate').onclick=duplicate;
+    document.getElementById('resetView').onclick=()=>{camera.position.set(8,7,10);controls.target.set(0,0,0);controls.update()};
+    let down=null;renderer.domElement.addEventListener('pointerdown',e=>{down={x:e.clientX,y:e.clientY}});
+    renderer.domElement.addEventListener('pointerup',e=>{if(!down||Math.hypot(e.clientX-down.x,e.clientY-down.y)>4){down=null;return}down=null;const rect=renderer.domElement.getBoundingClientRect();pointer.x=((e.clientX-rect.left)/rect.width)*2-1;pointer.y=-((e.clientY-rect.top)/rect.height)*2+1;raycaster.setFromCamera(pointer,camera);const hit=raycaster.intersectObjects(objects,false)[0];if(hit)select(hit.object);else if(!transform)select(null)});
+    function startTransform(mode){if(!selected)return;transform={mode,axis:null,start:selected.position.clone(),rotation:selected.rotation.clone(),scale:selected.scale.clone(),distance:0};document.getElementById('statusText').textContent=mode==='g'?'Di chuyển: nhập số hoặc chọn trục (X/Y/Z)':mode==='r'?'Xoay: nhập số hoặc chọn trục (X/Y/Z)':'Co giãn: nhập số hoặc chọn trục (X/Y/Z)';say(mode.toUpperCase()+' · chọn trục hoặc nhập số')}
+    function commit(){if(!transform)return;transform=null;document.getElementById('statusText').textContent=selected?'Đã chọn: '+selected.name:'Sẵn sàng';renderProps()}
+    function cancel(){if(!transform)return;selected.position.copy(transform.start);selected.rotation.copy(transform.rotation);selected.scale.copy(transform.scale);transform=null;renderProps();document.getElementById('statusText').textContent='Đã hủy thao tác'}
+    function applyDelta(d){if(!transform||!selected)return;const ax=transform.axis;if(transform.mode==='g'){if(ax)selected.position[ax]+=d;else selected.position.y+=d}if(transform.mode==='r'){if(ax)selected.rotation[ax]+=THREE.MathUtils.degToRad(d);else selected.rotation.y+=THREE.MathUtils.degToRad(d)}if(transform.mode==='s'){if(ax)selected.scale[ax]=Math.max(.01,selected.scale[ax]+d);else selected.scale.multiplyScalar(Math.max(.01,1+d))}renderProps()}
+    window.addEventListener('keydown',e=>{if(e.target instanceof HTMLInputElement)return;if(transform){if(e.key==='Escape'){cancel();return}if(e.key==='Enter'){commit();return}if('xyzXYZ'.includes(e.key)){transform.axis=e.key.toLowerCase();say('Khóa trục '+transform.axis.toUpperCase());return}if(e.key==='Backspace'){transform.distance=0;return}if(e.key==='-'||e.key==='.'||/[0-9]/.test(e.key)){const v=Number((transform.distance||'')+e.key);transform.distance=String(v);const sign=e.key==='-'?-1:1;applyDelta(sign*(Number(e.key)||0));return}return}
+      if(e.key==='g'||e.key==='G')startTransform('g');else if(e.key==='r'||e.key==='R')startTransform('r');else if(e.key==='s'||e.key==='S')startTransform('s');else if(e.key==='Delete'||e.key==='Backspace'||e.key==='x'||e.key==='X')removeSelected();else if(e.shiftKey&&e.key.toLowerCase()==='d')duplicate();else if(e.key==='Escape')select(null)
+    });
+    function resize(){const w=host.clientWidth,h=host.clientHeight;renderer.setSize(w,h,false);camera.aspect=w/h;camera.updateProjectionMatrix()}new ResizeObserver(resize).observe(host);resize();
+    function animate(){requestAnimationFrame(animate);controls.update();renderer.render(scene,camera)}animate();renderList();updateCount();
+  </script>
+</body>
+</html>
