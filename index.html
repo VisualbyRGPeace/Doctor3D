@@ -1,0 +1,105 @@
+<!DOCTYPE html>
+<html lang="vi">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Doctor3D · Ghi chú &amp; Công việc</title>
+  <meta name="description" content="Web app mini: ghi chú nhanh và quản lý công việc, giao diện đẹp, lưu offline." />
+  <link rel="preconnect" href="https://fonts.googleapis.com" />
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+  <link href="https://fonts.googleapis.com/css2?family=Be+Vietnam+Pro:wght@400;500;600;700;800&display=swap" rel="stylesheet" />
+  <link rel="stylesheet" href="styles.css" />
+</head>
+<body>
+  <div class="bg-glow" aria-hidden="true"></div>
+
+  <header class="app-header">
+    <div class="brand">
+      <div class="logo">3D</div>
+      <div>
+        <h1>Doctor3D</h1>
+        <p>Ghi chú &amp; công việc của bạn</p>
+      </div>
+    </div>
+    <button id="themeToggle" class="icon-btn" title="Đổi giao diện sáng / tối" aria-label="Đổi giao diện">
+      <span class="icon-sun">☀️</span><span class="icon-moon">🌙</span>
+    </button>
+  </header>
+
+  <nav class="tabs" role="tablist">
+    <button class="tab active" data-tab="notes" role="tab">📝 Ghi chú <span class="count" id="notesCount">0</span></button>
+    <button class="tab" data-tab="todos" role="tab">✅ Việc cần làm <span class="count" id="todosCount">0</span></button>
+  </nav>
+
+  <main>
+    <!-- ============ GHI CHÚ ============ -->
+    <section id="tab-notes" class="panel active">
+      <div class="toolbar">
+        <div class="search-box">
+          <span>🔍</span>
+          <input id="noteSearch" type="text" placeholder="Tìm ghi chú..." />
+        </div>
+        <button id="addNoteBtn" class="btn primary">＋ Ghi chú mới</button>
+      </div>
+      <div id="notesGrid" class="notes-grid"></div>
+      <div id="notesEmpty" class="empty hidden">
+        <div class="empty-icon">🗒️</div>
+        <p>Chưa có ghi chú nào.<br />Bấm <strong>“Ghi chú mới”</strong> để bắt đầu.</p>
+      </div>
+    </section>
+
+    <!-- ============ VIỆC CẦN LÀM ============ -->
+    <section id="tab-todos" class="panel">
+      <div class="progress-card">
+        <div class="progress-info">
+          <span id="progressText">0 / 0 hoàn thành</span>
+          <span id="progressPct">0%</span>
+        </div>
+        <div class="progress-bar"><div id="progressFill"></div></div>
+      </div>
+      <form id="todoForm" class="todo-form">
+        <input id="todoInput" type="text" placeholder="Việc cần làm hôm nay là gì?" maxlength="120" autocomplete="off" />
+        <button type="submit" class="btn primary">Thêm</button>
+      </form>
+      <div class="filters">
+        <button class="chip active" data-filter="all">Tất cả</button>
+        <button class="chip" data-filter="active">Chưa xong</button>
+        <button class="chip" data-filter="done">Đã xong</button>
+        <button id="clearDone" class="chip danger">🗑 Xóa việc đã xong</button>
+      </div>
+      <ul id="todoList" class="todo-list"></ul>
+      <div id="todosEmpty" class="empty hidden">
+        <div class="empty-icon">🎉</div>
+        <p>Không có việc nào ở đây.<br />Thêm việc mới ở ô phía trên nhé.</p>
+      </div>
+    </section>
+  </main>
+
+  <!-- Modal ghi chú -->
+  <div id="noteModal" class="modal hidden">
+    <div class="modal-card">
+      <h2 id="modalTitle">Ghi chú mới</h2>
+      <input id="noteTitle" type="text" placeholder="Tiêu đề..." maxlength="80" />
+      <textarea id="noteBody" rows="6" placeholder="Nội dung ghi chú..."></textarea>
+      <div class="color-row" id="colorRow">
+        <button class="color-dot selected" data-color="default" style="--c:#ffffff" title="Trắng"></button>
+        <button class="color-dot" data-color="yellow" style="--c:#fef3c7" title="Vàng"></button>
+        <button class="color-dot" data-color="green" style="--c:#d1fae5" title="Xanh lá"></button>
+        <button class="color-dot" data-color="blue" style="--c:#dbeafe" title="Xanh dương"></button>
+        <button class="color-dot" data-color="pink" style="--c:#fce7f3" title="Hồng"></button>
+        <button class="color-dot" data-color="purple" style="--c:#ede9fe" title="Tím"></button>
+      </div>
+      <div class="modal-actions">
+        <button id="cancelNote" class="btn ghost">Hủy</button>
+        <button id="saveNote" class="btn primary">Lưu</button>
+      </div>
+    </div>
+  </div>
+
+  <footer class="app-footer">
+    <p>Dữ liệu lưu trên trình duyệt của bạn (offline) · Làm bằng ❤️</p>
+  </footer>
+
+  <script src="app.js"></script>
+</body>
+</html>
