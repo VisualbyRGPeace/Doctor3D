@@ -16,15 +16,19 @@ const store = {
   }
 };
 
-const NOTE_COLORS = {
-  default: "#6366f1", yellow: "#f59e0b", green: "#10b981",
-  blue: "#3b82f6", pink: "#ec4899", purple: "#8b5cf6"
+/* Tông xám cho viền nhấn của ghi chú */
+const NOTE_SHADES = {
+  ink: "#0a0a0a", dark: "#525252", mid: "#8a8a8e",
+  light: "#c9c9ce", pale: "#e9e9ec", white: "#ffffff"
 };
+
+const svgIcon = (id, cls = "ic ic-sm") =>
+  `<svg class="${cls}" aria-hidden="true"><use href="#${id}"/></svg>`;
 
 let notes = store.get("doctor3d_notes", []);
 let todos = store.get("doctor3d_todos", []);
 let editingNoteId = null;
-let noteColor = "default";
+let noteShade = "ink";
 let todoFilter = "all";
 
 /* ---------- Theme ---------- */
@@ -69,12 +73,12 @@ function renderNotes() {
   $("#notesEmpty").classList.toggle("hidden", list.length > 0);
 
   grid.innerHTML = list.map((n) => `
-    <article class="note-card" data-id="${n.id}" style="--note-color:${NOTE_COLORS[n.color] || NOTE_COLORS.default}">
+    <article class="note-card" data-id="${n.id}" style="--note-accent:${NOTE_SHADES[n.color] || NOTE_SHADES.ink}">
       <h3>${esc(n.title) || "Không tiêu đề"}</h3>
       <p>${esc(n.body)}</p>
       <div class="note-meta">
         <span class="note-date">${fmtDate(n.updatedAt)}</span>
-        <button class="note-del" data-del="${n.id}" title="Xóa ghi chú">🗑️</button>
+        <button class="note-del" data-del="${n.id}" title="Xóa ghi chú">${svgIcon("i-trash")}</button>
       </div>
     </article>`).join("");
 }
@@ -102,9 +106,9 @@ function openNoteModal(id = null) {
   $("#modalTitle").textContent = n ? "Sửa ghi chú" : "Ghi chú mới";
   $("#noteTitle").value = n ? n.title : "";
   $("#noteBody").value = n ? n.body : "";
-  noteColor = n ? n.color : "default";
+  noteShade = n && NOTE_SHADES[n.color] ? n.color : "ink";
   $$("#colorRow .color-dot").forEach((d) =>
-    d.classList.toggle("selected", d.dataset.color === noteColor));
+    d.classList.toggle("selected", d.dataset.color === noteShade));
   $("#noteModal").classList.remove("hidden");
   setTimeout(() => $("#noteTitle").focus(), 50);
 }
@@ -121,7 +125,7 @@ document.addEventListener("keydown", (e) => {
 
 $$("#colorRow .color-dot").forEach((d) => {
   d.addEventListener("click", () => {
-    noteColor = d.dataset.color;
+    noteShade = d.dataset.color;
     $$("#colorRow .color-dot").forEach((x) => x.classList.remove("selected"));
     d.classList.add("selected");
   });
@@ -133,9 +137,9 @@ $("#saveNote").addEventListener("click", () => {
   if (!title && !body) { $("#noteTitle").focus(); return; }
   if (editingNoteId) {
     const n = notes.find((x) => x.id === editingNoteId);
-    if (n) { n.title = title; n.body = body; n.color = noteColor; n.updatedAt = Date.now(); }
+    if (n) { n.title = title; n.body = body; n.color = noteShade; n.updatedAt = Date.now(); }
   } else {
-    notes.push({ id: "n" + Date.now(), title, body, color: noteColor, updatedAt: Date.now() });
+    notes.push({ id: "n" + Date.now(), title, body, color: noteShade, updatedAt: Date.now() });
   }
   store.set("doctor3d_notes", notes);
   renderNotes();
@@ -161,9 +165,9 @@ function renderTodos() {
 
   list.innerHTML = visible.map((t) => `
     <li class="todo-item ${t.done ? "done" : ""}" data-id="${t.id}">
-      <button class="todo-check" data-check="${t.id}" title="Đánh dấu xong">${t.done ? "✓" : ""}</button>
+      <button class="todo-check" data-check="${t.id}" title="Đánh dấu xong">${svgIcon("i-check")}</button>
       <span class="todo-text">${esc(t.text)}</span>
-      <button class="todo-del" data-tdel="${t.id}" title="Xóa">✕</button>
+      <button class="todo-del" data-tdel="${t.id}" title="Xóa">${svgIcon("i-x")}</button>
     </li>`).join("");
 }
 

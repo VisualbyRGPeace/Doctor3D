@@ -1,6 +1,6 @@
 # Doctor3D · Ghi chú & Công việc
 
-Web app mini giúp ghi chú nhanh và quản lý việc cần làm, với giao diện hiện đại, đẹp mắt.
+Web app mini giúp ghi chú nhanh và quản lý việc cần làm, với giao diện trắng–đen tối giản, icon line tinh tế.
 
 ## Tính năng
 

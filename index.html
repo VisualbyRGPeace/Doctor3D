@@ -4,14 +4,47 @@
   <meta charset="UTF-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
   <title>Doctor3D · Ghi chú &amp; Công việc</title>
-  <meta name="description" content="Web app mini: ghi chú nhanh và quản lý công việc, giao diện đẹp, lưu offline." />
+  <meta name="description" content="Web app mini: ghi chú nhanh và quản lý công việc. Giao diện trắng đen tối giản, lưu offline." />
   <link rel="preconnect" href="https://fonts.googleapis.com" />
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
   <link href="https://fonts.googleapis.com/css2?family=Be+Vietnam+Pro:wght@400;500;600;700;800&display=swap" rel="stylesheet" />
   <link rel="stylesheet" href="styles.css" />
 </head>
 <body>
-  <div class="bg-glow" aria-hidden="true"></div>
+  <svg width="0" height="0" style="position:absolute" aria-hidden="true">
+    <defs>
+      <symbol id="i-sun" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+        <circle cx="12" cy="12" r="5"/><line x1="12" y1="1" x2="12" y2="3"/><line x1="12" y1="21" x2="12" y2="23"/><line x1="4.22" y1="4.22" x2="5.64" y2="5.64"/><line x1="18.36" y1="18.36" x2="19.78" y2="19.78"/><line x1="1" y1="12" x2="3" y2="12"/><line x1="21" y1="12" x2="23" y2="12"/><line x1="4.22" y1="19.78" x2="5.64" y2="18.36"/><line x1="18.36" y1="5.64" x2="19.78" y2="4.22"/>
+      </symbol>
+      <symbol id="i-moon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+        <path d="M21 12.79A9 9 0 1 1 11.21 3 7 7 0 0 0 21 12.79z"/>
+      </symbol>
+      <symbol id="i-search" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+        <circle cx="11" cy="11" r="8"/><line x1="21" y1="21" x2="16.65" y2="16.65"/>
+      </symbol>
+      <symbol id="i-plus" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+        <line x1="12" y1="5" x2="12" y2="19"/><line x1="5" y1="12" x2="19" y2="12"/>
+      </symbol>
+      <symbol id="i-note" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+        <path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z"/><polyline points="14 2 14 8 20 8"/><line x1="16" y1="13" x2="8" y2="13"/><line x1="16" y1="17" x2="8" y2="17"/>
+      </symbol>
+      <symbol id="i-todo" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+        <polyline points="9 11 12 14 22 4"/><path d="M21 12v7a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h11"/>
+      </symbol>
+      <symbol id="i-trash" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+        <polyline points="3 6 5 6 21 6"/><path d="M19 6v14a2 2 0 0 1-2 2H7a2 2 0 0 1-2-2V6m3 0V4a2 2 0 0 1 2-2h4a2 2 0 0 1 2 2v2"/>
+      </symbol>
+      <symbol id="i-x" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+        <line x1="18" y1="6" x2="6" y2="18"/><line x1="6" y1="6" x2="18" y2="18"/>
+      </symbol>
+      <symbol id="i-check" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round">
+        <polyline points="20 6 9 17 4 12"/>
+      </symbol>
+      <symbol id="i-check-circle" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+        <path d="M22 11.08V12a10 10 0 1 1-5.93-9.14"/><polyline points="22 4 12 14.01 9 11.01"/>
+      </symbol>
+    </defs>
+  </svg>
 
   <header class="app-header">
     <div class="brand">
@@ -22,13 +55,18 @@
       </div>
     </div>
     <button id="themeToggle" class="icon-btn" title="Đổi giao diện sáng / tối" aria-label="Đổi giao diện">
-      <span class="icon-sun">☀️</span><span class="icon-moon">🌙</span>
+      <svg class="ic icon-sun"><use href="#i-sun"/></svg>
+      <svg class="ic icon-moon"><use href="#i-moon"/></svg>
     </button>
   </header>
 
   <nav class="tabs" role="tablist">
-    <button class="tab active" data-tab="notes" role="tab">📝 Ghi chú <span class="count" id="notesCount">0</span></button>
-    <button class="tab" data-tab="todos" role="tab">✅ Việc cần làm <span class="count" id="todosCount">0</span></button>
+    <button class="tab active" data-tab="notes" role="tab">
+      <svg class="ic"><use href="#i-note"/></svg>Ghi chú <span class="count" id="notesCount">0</span>
+    </button>
+    <button class="tab" data-tab="todos" role="tab">
+      <svg class="ic"><use href="#i-todo"/></svg>Việc cần làm <span class="count" id="todosCount">0</span>
+    </button>
   </nav>
 
   <main>
@@ -36,14 +74,16 @@
     <section id="tab-notes" class="panel active">
       <div class="toolbar">
         <div class="search-box">
-          <span>🔍</span>
+          <svg class="ic ic-sm"><use href="#i-search"/></svg>
           <input id="noteSearch" type="text" placeholder="Tìm ghi chú..." />
         </div>
-        <button id="addNoteBtn" class="btn primary">＋ Ghi chú mới</button>
+        <button id="addNoteBtn" class="btn primary">
+          <svg class="ic"><use href="#i-plus"/></svg>Ghi chú mới
+        </button>
       </div>
       <div id="notesGrid" class="notes-grid"></div>
       <div id="notesEmpty" class="empty hidden">
-        <div class="empty-icon">🗒️</div>
+        <div class="empty-icon"><svg class="ic"><use href="#i-note"/></svg></div>
         <p>Chưa có ghi chú nào.<br />Bấm <strong>“Ghi chú mới”</strong> để bắt đầu.</p>
       </div>
     </section>
@@ -59,17 +99,17 @@
       </div>
       <form id="todoForm" class="todo-form">
         <input id="todoInput" type="text" placeholder="Việc cần làm hôm nay là gì?" maxlength="120" autocomplete="off" />
-        <button type="submit" class="btn primary">Thêm</button>
+        <button type="submit" class="btn primary"><svg class="ic"><use href="#i-plus"/></svg>Thêm</button>
       </form>
       <div class="filters">
         <button class="chip active" data-filter="all">Tất cả</button>
         <button class="chip" data-filter="active">Chưa xong</button>
         <button class="chip" data-filter="done">Đã xong</button>
-        <button id="clearDone" class="chip danger">🗑 Xóa việc đã xong</button>
+        <button id="clearDone" class="chip danger"><svg class="ic ic-sm"><use href="#i-trash"/></svg>Xóa việc đã xong</button>
       </div>
       <ul id="todoList" class="todo-list"></ul>
       <div id="todosEmpty" class="empty hidden">
-        <div class="empty-icon">🎉</div>
+        <div class="empty-icon"><svg class="ic"><use href="#i-check-circle"/></svg></div>
         <p>Không có việc nào ở đây.<br />Thêm việc mới ở ô phía trên nhé.</p>
       </div>
     </section>
@@ -81,13 +121,14 @@
       <h2 id="modalTitle">Ghi chú mới</h2>
       <input id="noteTitle" type="text" placeholder="Tiêu đề..." maxlength="80" />
       <textarea id="noteBody" rows="6" placeholder="Nội dung ghi chú..."></textarea>
+      <div class="shade-label">Tông màu</div>
       <div class="color-row" id="colorRow">
-        <button class="color-dot selected" data-color="default" style="--c:#ffffff" title="Trắng"></button>
-        <button class="color-dot" data-color="yellow" style="--c:#fef3c7" title="Vàng"></button>
-        <button class="color-dot" data-color="green" style="--c:#d1fae5" title="Xanh lá"></button>
-        <button class="color-dot" data-color="blue" style="--c:#dbeafe" title="Xanh dương"></button>
-        <button class="color-dot" data-color="pink" style="--c:#fce7f3" title="Hồng"></button>
-        <button class="color-dot" data-color="purple" style="--c:#ede9fe" title="Tím"></button>
+        <button class="color-dot selected" data-color="ink" style="--c:#0a0a0a" title="Đen"></button>
+        <button class="color-dot" data-color="dark" style="--c:#525252" title="Xám đậm"></button>
+        <button class="color-dot" data-color="mid" style="--c:#8a8a8e" title="Xám"></button>
+        <button class="color-dot" data-color="light" style="--c:#c9c9ce" title="Xám nhạt"></button>
+        <button class="color-dot" data-color="pale" style="--c:#e9e9ec" title="Xám rất nhạt"></button>
+        <button class="color-dot" data-color="white" style="--c:#ffffff" title="Trắng"></button>
       </div>
       <div class="modal-actions">
         <button id="cancelNote" class="btn ghost">Hủy</button>
@@ -97,7 +138,7 @@
   </div>
 
   <footer class="app-footer">
-    <p>Dữ liệu lưu trên trình duyệt của bạn (offline) · Làm bằng ❤️</p>
+    <span>Lưu trữ cục bộ trên trình duyệt</span><span class="dot"></span><span>Hoạt động offline</span>
   </footer>
 
   <script src="app.js"></script>
